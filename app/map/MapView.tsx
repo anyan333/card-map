@@ -315,9 +315,11 @@ cursor: "pointer",
       </div>
     )}
     <button
-  onClick={() =>
-    deleteReport(report.id)
-  }
+  type="button"
+  onClick={(e) => {
+    e.stopPropagation();
+    deleteReport(report.id);
+  }}
   style={{
     marginTop: "6px",
     backgroundColor: "#ff8080",
