@@ -236,6 +236,7 @@ width: "100%",
     <br />
 
 <button
+type="button"
 onClick={() =>
 deleteStore(store.id)
 }
