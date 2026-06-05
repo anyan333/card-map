@@ -10,7 +10,14 @@ Popup,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -99,6 +106,68 @@ memo: string;
 };
 
 export default function MapView() {
+    const deleteReport = async (
+  reportId: string
+) => {
+  const ok = confirm(
+    "この購入報告を削除する？"
+  );
+
+  if (!ok) return;
+
+  await deleteDoc(
+    doc(db, "reports", reportId)
+  );
+
+  setReports((prev) =>
+    prev.filter(
+      (report) =>
+        report.id !== reportId
+    )
+  );
+};
+const deleteStore = async (
+storeId: string
+) => {
+const ok = confirm(
+"店舗と購入履歴を全部削除する？"
+);
+
+if (!ok) return;
+
+const reportsQuery = query(
+  collection(db, "reports"),
+  where("storeId", "==", storeId)
+);
+
+const reportsSnapshot =
+  await getDocs(reportsQuery);
+
+for (const reportDoc of reportsSnapshot.docs) {
+  await deleteDoc(
+    doc(db, "reports", reportDoc.id)
+  );
+}
+
+await deleteDoc(
+  doc(db, "stores", storeId)
+);
+
+setStores((prev) =>
+  prev.filter(
+    (store) =>
+      store.id !== storeId
+  )
+);
+
+setReports((prev) =>
+  prev.filter(
+    (report) =>
+      report.storeId !== storeId
+  )
+);
+
+};
 const [stores, setStores] = useState<Store[]>([]);
 const [reports, setReports] = useState<Report[]>([]);
 
@@ -164,6 +233,27 @@ width: "100%",
 <Popup>
   <div style={{ minWidth: "220px" }}>
     <strong>{store.name}</strong>
+    <br />
+
+<button
+onClick={() =>
+deleteStore(store.id)
+}
+style={{
+marginTop: "6px",
+marginBottom: "8px",
+backgroundColor: "#ff4d4d",
+color: "white",
+border: "none",
+padding: "6px 10px",
+borderRadius: "6px",
+cursor: "pointer",
+}}
+
+>
+
+店舗削除 </button>
+
 
     <hr />
 
@@ -224,11 +314,27 @@ width: "100%",
         メモ: {report.memo}
       </div>
     )}
+    <button
+  onClick={() =>
+    deleteReport(report.id)
+  }
+  style={{
+    marginTop: "6px",
+    backgroundColor: "#ff8080",
+    border: "none",
+    padding: "4px 8px",
+    borderRadius: "6px",
+    cursor: "pointer",
+  }}
+>
+  購入報告削除
+</button>
   </div>
 ))
 
 
 )}
+
 
   </div>
 </Popup>
