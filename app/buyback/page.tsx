@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BottomNav from "../components/BottomNav";
 import {
 collection,
 addDoc,
@@ -247,6 +248,7 @@ return ( <main className="min-h-screen bg-gradient-to-b from-pink-100 via-blue-1
       </div>
     ))}
   </div>
+  <BottomNav />
 </main>
 
 
