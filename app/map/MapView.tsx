@@ -170,6 +170,7 @@ setReports((prev) =>
 };
 const [stores, setStores] = useState<Store[]>([]);
 const [reports, setReports] = useState<Report[]>([]);
+const [search, setSearch] = useState("");
 
 useEffect(() => {
 const fetchData = async () => {
@@ -201,22 +202,57 @@ fetchData();
 
 
 }, []);
+const filteredStores = stores.filter((store) =>
+  store.name
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
+
 
 return (
-<MapContainer
-center={[34.4859, 133.3623]}
-zoom={13}
-style={{
-height: "100vh",
-width: "100%",
-}}
-> <TileLayer
+  <>
+    <div
+      style={{
+        position: "fixed",
+        top: "10px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 1000,
+      }}
+    >
+      <input
+        type="text"
+        placeholder="🔍 店舗検索"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{
+          width: "300px",
+          padding: "10px",
+          borderRadius: "12px",
+          border: "1px solid #ccc",
+          background: "white",
+          color: "black",
+  fontSize: "16px",
+        }}
+      />
+    </div>
+
+    <MapContainer
+      center={[34.4859, 133.3623]}
+      zoom={13}
+      style={{
+        height: "100vh",
+        width: "100%",
+      }}
+    >
+
+    <TileLayer
      attribution="&copy; OpenStreetMap contributors"
      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
    />
 
 
-  {stores.map((store) => {
+  {filteredStores.map((store) => {
     const storeReports = reports.filter(
       (report) => report.storeId === store.id
     );
@@ -345,6 +381,6 @@ cursor: "pointer",
 );
 })}
 </MapContainer>
-
+</>
 );
 }
